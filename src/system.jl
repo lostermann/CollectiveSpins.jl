@@ -7,12 +7,12 @@ using LinearAlgebra
 """
 Abstract base class for all systems defined in this library.
 
-Currently there are following concrete systems:
+Currently there are the following concrete systems:
 
 * Spin
 * SpinCollection
-* CavityMode
-* CavitySpinCollection
+* CavityMode (Quantum only)
+* CavitySpinCollection (Quantum only)
 """
 abstract type System end
 
@@ -30,9 +30,6 @@ frequency.
 struct Spin <: System
     position::Vector{Float64}
     delta::Float64
-    function Spin(position::Vector{T}; delta::Real=0.) where T<:Real
-        new(position, delta)
-    end
 end
 
 

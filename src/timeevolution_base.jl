@@ -1,7 +1,19 @@
 import OrdinaryDiffEq, DiffEqCallbacks
 
 """
-integrate()
+integrate(T, f, state0, fout; alg=OrdinaryDiffEq.DP5(), callback=nothing, kwargs...)
+
+Generic integration function that handles time integration via the DifferentialEquations package.
+
+# Arguments:
+
+* `T`: Vector of time steps
+* `f`: Integrating function
+* `state0`: Initial condition
+``fout`: return function
+* `alg`: Set the algorithm that is used by DifferentialEquations
+* `callback`: callback function to DifferentialEquations
+* `kwargs...`: furhter keyword arguments passed on to the solver
 """
 function integrate(T::Vector{Float64}, f:: Function, state0::S, fout::Function;
                     alg::OrdinaryDiffEq.OrdinaryDiffEqAlgorithm = OrdinaryDiffEq.DP5(),

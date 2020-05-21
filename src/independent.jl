@@ -112,16 +112,18 @@ Independent time evolution.
 * `gamma`: Single spin decay rate.
 * `state0`: Initial state.
 """
-function timeevolution(T, gamma::Number, state0::Vector{Float64}; kwargs...)
+function timeevolution(T, gammas::Vector{Float64}, state0::Vector{Float64}; kwargs...)
     N = dim(state0)
-    γ = gamma
+    
+    @assert length(gammas) == N
+    
     function f(ds::Vector{Float64}, s::Vector{Float64}, p, t)
         sx, sy, sz = splitstate(s)
         dsx, dsy, dsz = splitstate(ds)
         @inbounds for k=1:N
-            dsx[k] = -0.5*γ*sx[k]
-            dsy[k] = -0.5*γ*sy[k]
-            dsz[k] = -γ*(1+sz[k])
+            dsx[k] = -0.5*gammas[k]*sx[k]
+            dsy[k] = -0.5*gammas[k]*sy[k]
+            dsz[k] = -gammas[k]*(1+sz[k])
         end
     end
 
@@ -130,6 +132,7 @@ function timeevolution(T, gamma::Number, state0::Vector{Float64}; kwargs...)
     return integrate(T, f, state0, fout_; kwargs...)
 end
 
+timeevolution(T, gamma::Number, state0::Vector{Float64}; kwargs...) = timeevolution(T, [gamma for i=1:dim(state0)], state0; kwargs...)
 """
     independent.timeevolution(T, S::SpinCollection, state0)
 
@@ -140,6 +143,6 @@ Independent time evolution.
 * `S`: SpinCollection describing the system.
 * `state0`: Initial state.
 """
-timeevolution(T, S::system.SpinCollection, state0::Vector{Float64}) = timeevolution(T, S.gamma, state0)
+timeevolution(T, S::system.SpinCollection, state0::Vector{Float64}) = timeevolution(T, S.gammas, state0)
 
 end # module

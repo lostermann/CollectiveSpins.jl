@@ -11,9 +11,9 @@ using ..interaction, ..system
 
 
 """
-    ReducedSpinBasis(N, M)
+    ReducedSpinBasis(N, M, MS)
 
-Basis for a system of N spin 1/2 systems, up to the M'th excitation.
+Basis for a system of N spin 1/2 systems, up to the M'th excitation manifold, starting from the MS'th excitation manifold.
 """
 mutable struct ReducedSpinBasis{N, M} <: Basis
     shape::Vector{Int}
@@ -38,12 +38,14 @@ mutable struct ReducedSpinBasis{N, M} <: Basis
         for k=MS:M
             append!(inds, collect(combinations(1:N,k)))
         end
-        @assert length(inds)==dim
+        @assert length(inds) == dim
         indexMapper = (inds .=> [1:dim;])
         new{N, M}([dim], N, M, MS, indexMapper)
     end
 end
+
 ReducedSpinBasis(N::Int, M::Int) = ReducedSpinBasis(N, M, 0)
+
 function Base.show(stream::IO, b::ReducedSpinBasis)
     write(stream, "ReducedSpin(N=$(b.N), M=$(b.M), MS=$(b.MS))")
 end
@@ -63,6 +65,7 @@ function index(b::ReducedSpinBasis, x::Vector{Int})
     isa(i, Nothing) && throw(BoundsError(b, x_))
     return b.indexMapper[i][2]
 end
+
 index(b::ReducedSpinBasis, x::Int) = index(b, [x])
 index(b::ReducedSpinBasis, x) = index(b, convert(Vector{Int}, x))
 
@@ -94,7 +97,7 @@ function reducedsigmap(b::ReducedSpinBasis, j::Int)
     for m=MS+1:M
         to, from = transition_idx(b, j, m)
         for i=1:length(to)
-            op.data[to[i],from[i]] = 1.0
+            op.data[to[i],from[i]] = 1.
         end
     end
     return op
@@ -181,42 +184,6 @@ end
 
 State where the excitations are placed in the atoms given by `inds`. Note, that
 `b.MS <= length(inds) <= b.M` must be satisfied.
-
-# Examples
-```julia-repl
-julia> b = CollectiveSpins.ReducedSpinBasis(4,2)
-ReducedSpin(N=4, M=2, MS=0)
-
-julia> GS = CollectiveSpins.reducedspinstate(b,[]) # get the ground state
-Ket(dim=11)
-  basis: ReducedSpin(N=4, M=2, MS=0)
- 1.0 + 0.0im
- 0.0 + 0.0im
- 0.0 + 0.0im
- 0.0 + 0.0im
- 0.0 + 0.0im
- 0.0 + 0.0im
- 0.0 + 0.0im
- 0.0 + 0.0im
- 0.0 + 0.0im
- 0.0 + 0.0im
- 0.0 + 0.0im
-
-julia> ψ2 = CollectiveSpins.reducedspinstate(b,[1,2]) # First and second atom excited
-Ket(dim=11)
-  basis: ReducedSpin(N=4, M=2, MS=0)
- 0.0 + 0.0im
- 0.0 + 0.0im
- 0.0 + 0.0im
- 0.0 + 0.0im
- 0.0 + 0.0im
- 1.0 + 0.0im
- 0.0 + 0.0im
- 0.0 + 0.0im
- 0.0 + 0.0im
- 0.0 + 0.0im
- 0.0 + 0.0im
-```
 """
 function reducedspinstate(b::ReducedSpinBasis, inds::Vector{Int})
     basisstate(b, index(b, inds))
