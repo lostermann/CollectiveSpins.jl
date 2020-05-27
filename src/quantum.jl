@@ -134,12 +134,12 @@ end
 Jump operators of the given system.
 """
 function JumpOperators(S::system.SpinCollection)
-    J = SparseOperator[embed(basis(S), i, sigmam_) for i=1:length(S.spins)]
+    J = SparseOpType[embed(basis(S), i, sigmam_) for i=1:length(S.spins)]
     Γ = interaction.GammaMatrix(S)
     return Γ, J
 end
 
-JumpOperators(S::system.CavityMode) = (Float64[2*S.kappa], SparseOperator[SparseOperator(destroy(basis(S)))])
+JumpOperators(S::system.CavityMode) = (Float64[2*S.kappa], SparseOpType[SparseOperator(destroy(basis(S)))])
 
 function JumpOperators(S::system.CavitySpinCollection)
     Γs, Js = JumpOperators(S.spincollection)
@@ -151,7 +151,7 @@ function JumpOperators(S::system.CavitySpinCollection)
     Γ[1:Nc, 1:Nc] = Γc
     Γ[Nc+1:end, Nc+1:end] = Γs
     Ic = identityoperator(basis(S.cavity))
-    J = SparseOperator[embed(basis(S), 1, Jc[1])]
+    J = SparseOpType[embed(basis(S), 1, Jc[1])]
     for j in Js
         push!(J, tensor(Ic, j))
     end
