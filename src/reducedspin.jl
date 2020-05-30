@@ -254,4 +254,22 @@ function timeevolution(T, system::SpinCollection, psi0::Union{Ket{B}, DenseOpTyp
     return QuantumOptics.timeevolution.master_h(T, psi0, H, J; fout=fout, rates=GammaM, kwargs...)
 end
 
+"""
+    reducedspin.Hamiltonian:nh(b, S)
+    
+    Non-Hermitian Hamiltonian. Only useful for N=1.
+"""
+function Hamiltonian_nh(b::ReducedSpinBasis, S::SpinCollection)
+    N = length(S.spins)
+    @assert b.N == N
+    @assert b.M == 1
+    
+    Ω = interaction.OmegaMatrix(S)
+    Γ = interaction.GammaMatrix(S)
+    
+    H_nh = sum((Ω[i, j]- 1.0im/2*Γ[i, j])*reducedsigmap(b, i)*reducedsigmam(b, j) for i=1:N, j=1:N)
+    
+    return H_nh
+end
+
 end # module
