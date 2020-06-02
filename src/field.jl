@@ -75,7 +75,7 @@ function intensity(r::Vector{Float64}, S::SpinCollection, state::Union{Vector, P
         e(r, i) = greenstensor(r - S.spins[i].position) * S.polarizations[i]
                    
         if reduced
-            b = state.basis
+            b = isa(state, StateVector) ? state.basis : state.basis_l
             smr(i) = reducedspin.reducedsigmam(b, i)
             intensity = sum(dot(e(r, i), e(r, j))*dagger(smr(i))*smr(j) for i=1:N, j=1:N)
             return expect(intensity, state)

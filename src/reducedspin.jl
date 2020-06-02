@@ -244,30 +244,35 @@ function JumpOperators(S::SpinCollection, M::Int=1)
 """
     time evolution
 """
-function timeevolution(T, system::SpinCollection, psi0::Union{Ket{B}, DenseOpType{B, B}}; fout=nothing, kwargs...) where B <: ReducedSpinBasis
+function timeevolution(T, S::SpinCollection, psi0::Union{Ket{B}, DenseOpType{B, B}}; fout=nothing, kwargs...) where B <: ReducedSpinBasis
 
-    M = isa(psi0, Ket) ? psi.bais.M : psi0.basis_l.M
+    M = isa(psi0, Ket) ? psi0.basis.M : psi0.basis_l.M
 
     H = Hamiltonian(S, M)
-    GammaM, J = JumpOperators(S. M)
+    GammaM, J = JumpOperators(S, M)
 
     return QuantumOptics.timeevolution.master_h(T, psi0, H, J; fout=fout, rates=GammaM, kwargs...)
 end
 
 """
-    reducedspin.Hamiltonian:nh(b, S)
+    reducedspin.Hamiltonian_nh(b, S, [i_s=0, i_e=0])
     
     Non-Hermitian Hamiltonian. Only useful for N=1.
 """
-function Hamiltonian_nh(b::ReducedSpinBasis, S::SpinCollection)
+function Hamiltonian_nh(b::ReducedSpinBasis, S::SpinCollection; i_s::Int=0, i_e::Int=0)
     N = length(S.spins)
     @assert b.N == N
     @assert b.M == 1
     
+    if (i_s == 0) || (i_e == 0)
+        i_s = 1
+        i_e = N
+    end
+    
     Ω = interaction.OmegaMatrix(S)
     Γ = interaction.GammaMatrix(S)
     
-    H_nh = sum((Ω[i, j]- 1.0im/2*Γ[i, j])*reducedsigmap(b, i)*reducedsigmam(b, j) for i=1:N, j=1:N)
+    H_nh = sum((Ω[i, j]- 1.0im/2*Γ[i, j])*reducedsigmap(b, i)*reducedsigmam(b, j) for i=i_s:i_e, j=i_s:i_e)
     
     return H_nh
 end
