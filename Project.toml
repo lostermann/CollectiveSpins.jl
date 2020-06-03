@@ -15,7 +15,7 @@ Combinatorics = "1"
 DiffEqCallbacks = "2"
 Optim = "0.20"
 OrdinaryDiffEq = "5"
-QuantumOptics = "0.8"
+QuantumOptics = "0.8.0"
 QuantumOpticsBase = "0.1.5"
 julia = "1.3"
 
