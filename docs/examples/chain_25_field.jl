@@ -9,7 +9,7 @@ S = CollectiveSpins.SpinCollection(pos, [1., 0., 0.])
 # Basis and State
 b = CollectiveSpins.ReducedSpinBasis(N, 1)
 Heff = CollectiveSpins.reducedspin.Hamiltonian_nh(b, S)
-psi = eigenstates(dense(Heff))[2][end-3]
+psi = eigenstates(dense(Heff))[2][end]
 
 # Grid and Field
 I_exp(r) = CollectiveSpins.field.intensity(r, S, psi)
